@@ -1,0 +1,44 @@
+ {
+    "name": "John Doe",
+    "email": "john.doe@gmail.com",
+    "mobile": "9876543210",
+    "dob": "1990-05-15"
+  }
+
+  {
+    "name": "Jane Smith",
+    "email": "jane.smith@yahoo.com",
+    "mobile": "8765432109",
+    "dob": "1985-11-22"
+  }
+
+  {
+    "name": "Raj Patel",
+    "email": "raj.patel@outlook.com",
+    "mobile": "7654321098",
+    "dob": "1992-03-08"
+  }
+
+  {
+    "name": "Emily Chen",
+    "email": "emily.chen@gmail.com",
+    "mobile": "6543210987",
+    "dob": "1998-07-30"
+  }
+
+  {
+    "name": "Michael Brown",
+    "email": "michael.brown@hotmail.com",
+    "mobile": "5432109876",
+    "dob": "1988-01-12"
+  }
+
+
+curl --location 'http://localhost:8088/api/v1/cbook' \
+--header 'Content-Type: application/json' \
+--data-raw ' {
+                "name": "Emily Chen",
+                "email": "emily.chen@gmail.com",
+                "mobile": "6543210987",
+                "dob": "1998-07-30"
+              }'

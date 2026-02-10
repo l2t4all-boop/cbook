@@ -18,7 +18,10 @@ public class ContactDaoImpl implements ContactDao {
 
     @Override
     public Contact save(Contact contact) {
-        return null;
+        contact.setId(UUID.randomUUID());
+        String sql = "insert into contact (id, name, email, mobile, dob) values (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, contact.getId(), contact.getName(), contact.getEmail(), contact.getMobile(), contact.getDob());
+        return contact;
     }
 
     @Override
@@ -40,16 +43,29 @@ public class ContactDaoImpl implements ContactDao {
 
     @Override
     public Contact update(UUID id, Contact contact) {
-        return null;
+        String sql = "update contact set name = ?, email = ?, mobile = ?, dob = ? where id = ?";
+        jdbcTemplate.update(sql, contact.getName(), contact.getEmail(), contact.getMobile(), contact.getDob(), id);
+        contact.setId(id);
+        return contact;
     }
 
     @Override
     public void deleteById(UUID id) {
+        String sql = "delete from contact where id = ?";
+        jdbcTemplate.update(sql, id);
+    }
 
+    @Override
+    public Contact updateEmailOnly(UUID id, String email) {
+        String sql = "update contact set email = ? where id = ?";
+        jdbcTemplate.update(sql, email, id);
+        return findById(id).orElse(null);
     }
 
     @Override
     public List<Contact> findByKeyword(String keyword) {
-        return List.of();
+        String sql = "select id, name, email, mobile, dob from contact where name like ? or email like ? or mobile like ?";
+        String pattern = "%" + keyword + "%";
+        return jdbcTemplate.query(sql, new ContactRowMapper(), pattern, pattern, pattern);
     }
 }

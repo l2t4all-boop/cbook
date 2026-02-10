@@ -26,5 +26,7 @@ public interface ContactService {
 
     File exportContacts(String contentType);
 
+    ContactDto updateContactEmail(UUID id, String email);
+
     void sendEmail();
 }

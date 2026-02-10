@@ -13,4 +13,5 @@ public interface ContactDao {
     Contact update(UUID id, Contact contact);
     void deleteById(UUID id);
     List<Contact> findByKeyword(String keyword);
+    Contact updateEmailOnly(UUID id, String email);
 }

@@ -1,0 +1,234 @@
+{
+	"info": {
+		"_postman_id": "315956e0-62b8-44da-8208-66c76eecf710",
+		"name": "cbook",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "52268725",
+		"_collection_link": "https://l2t4all-1457682.postman.co/workspace/l2t-l2t's-Workspace~0184844e-6e4e-4831-8e00-47a8c456552d/collection/52268725-315956e0-62b8-44da-8208-66c76eecf710?action=share&source=collection_link&creator=52268725"
+	},
+	"item": [
+		{
+			"name": "add_contact",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Michael Brown\",\n    \"email\": \"michael.brown@hotmail.com\",\n    \"mobile\": \"5432109876\",\n    \"dob\": \"1988-01-12\"\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cbook",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cbook"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update_contact",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n            \"dob\": \"1988-01-12\",\n            \"email\": \"michael.b@hotmail.com\",\n            \"id\": \"5c09af56-b9cd-4b02-a43e-d51b7207f79c\",\n            \"mobile\": \"5432109876\",\n            \"name\": \"Michael B\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cbook/5c09af56-b9cd-4b02-a43e-d51b7207f79c",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cbook",
+						"5c09af56-b9cd-4b02-a43e-d51b7207f79c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_by_id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cbook/5c09af56-b9cd-4b02-a43e-d51b7207f79c",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cbook",
+						"5c09af56-b9cd-4b02-a43e-d51b7207f79c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cbook/search?keyword=a",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cbook",
+						"search"
+					],
+					"query": [
+						{
+							"key": "keyword",
+							"value": "a"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete_by_id",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cbook/5c09af56-b9cd-4b02-a43e-d51b7207f79c",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cbook",
+						"5c09af56-b9cd-4b02-a43e-d51b7207f79c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_all_contacts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cbook",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cbook"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
