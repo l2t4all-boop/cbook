@@ -19,5 +19,7 @@ public class ContactRowMapper implements RowMapper<Contact> {
         contact.setMobile(rs.getString("mobile"));
         return contact;
     }
+    
 
+    
 }
