@@ -3,6 +3,8 @@ package com.l2t.cbook.service;
 import com.l2t.cbook.dao.ContactDao;
 import com.l2t.cbook.domain.Contact;
 import com.l2t.cbook.dto.ContactDto;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -10,7 +12,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -84,15 +89,54 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public List<ContactDto> importContacts(MultipartFile file) {
         log.info("Importing contacts from file: {}", file.getOriginalFilename());
-        // TODO: implement CSV/Excel import
-        return List.of();
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.toLowerCase().endsWith(".csv")) {
+            throw new IllegalArgumentException("Only CSV allowed");
+        }
+
+        try (BufferedReader reader =
+                     new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+
+            return reader.lines()
+                    .skip(1)
+                    .map(line -> {
+                        String[] data = line.split(",");
+                        Contact contact = new Contact();
+                        contact.setName(data[0]);
+                        contact.setEmail(data[1]);
+                        contact.setMobile(data[2]);
+                        contact.setDob(LocalDate.parse(data[3]));
+                        return toDto(contactDao.save(contact));
+                    })
+                    .toList();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to import file", e);
+        }
     }
 
     @Override
     public File exportContacts(String contentType) {
         log.info("Exporting contacts as: {}", contentType);
-        // TODO: implement CSV/Excel export
-        return null;
+        File file = new File("contacts.csv");
+
+        try (PrintWriter writer = new PrintWriter(file)) {
+
+            writer.println("Name,Email,Mobile,DOB");
+
+            for (Contact c : contactDao.findAll()) {
+                writer.printf("%s,%s,%s,%s%n",
+                        c.getName(),
+                        c.getEmail(),
+                        c.getMobile(),
+                        c.getDob());
+            }
+
+            return file;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Export failed", e);
+        }
     }
 
     @Override
@@ -110,7 +154,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Async
     @Override
-    @Scheduled(cron = "* * 9 * * *")
+    @Scheduled(cron = "0 0 9 * * *")
     public void sendEmail() {
         log.info("Scheduled birthday email job started");
         List<Contact> contacts = contactDao.findAll();
@@ -168,7 +212,8 @@ public class ContactServiceImpl implements ContactService {
                 </div>
                 """.formatted(name);
     }
-
+    @Email
+    @NotBlank
     private void validateContact(ContactDto contactDto) {
         if (contactDto.getName() == null || contactDto.getName().isBlank()) {
             throw new IllegalArgumentException("Contact name must not be empty");
