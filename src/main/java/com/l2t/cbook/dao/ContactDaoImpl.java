@@ -1,7 +1,6 @@
 package com.l2t.cbook.dao;
 
 import com.l2t.cbook.domain.Contact;
-import com.l2t.cbook.mapper.ContactRowMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -15,57 +14,48 @@ import java.util.UUID;
 public class ContactDaoImpl implements ContactDao {
 
     private final JdbcTemplate jdbcTemplate;
+    private final ContactRepository contactRepository;
 
     @Override
     public Contact save(Contact contact) {
-        contact.setId(UUID.randomUUID());
-        String sql = "insert into contact (id, name, email, mobile, dob) values (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, contact.getId(), contact.getName(), contact.getEmail(), contact.getMobile(), contact.getDob());
-        return contact;
+        return contactRepository.save(contact);
     }
 
     @Override
     public Optional<Contact> findById(UUID id) {
-        String sql = "select id, name, email, mobile, dob from contact where id = ?";
-        try {
-            Contact contact = jdbcTemplate.queryForObject(sql, new ContactRowMapper(), id);
-            return Optional.of(contact);
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+        return contactRepository.findById(id);
     }
 
     @Override
     public List<Contact> findAll() {
-        String sql = "select id, name, email, mobile, dob from contact";
-        return jdbcTemplate.query(sql, new ContactRowMapper());
+        return contactRepository.findAll();
     }
 
     @Override
     public Contact update(UUID id, Contact contact) {
-        String sql = "update contact set name = ?, email = ?, mobile = ?, dob = ? where id = ?";
-        jdbcTemplate.update(sql, contact.getName(), contact.getEmail(), contact.getMobile(), contact.getDob(), id);
-        contact.setId(id);
-        return contact;
+        if (contactRepository.findById(id).isPresent()) {
+            return contactRepository.save(contact);
+        }
+        throw new IllegalArgumentException("Contact not found");
     }
 
     @Override
     public void deleteById(UUID id) {
-        String sql = "delete from contact where id = ?";
-        jdbcTemplate.update(sql, id);
+        contactRepository.deleteById(id);
     }
 
     @Override
     public Contact updateEmailOnly(UUID id, String email) {
-        String sql = "update contact set email = ? where id = ?";
-        jdbcTemplate.update(sql, email, id);
-        return findById(id).orElse(null);
+        if (contactRepository.existsById(id)) {
+            Contact contact = contactRepository.findById(id).get();
+            contact.setEmail(email);
+            return contactRepository.save(contact);
+        }
+        throw new IllegalArgumentException("Contact is not found with id " + id);
     }
 
     @Override
-    public List<Contact> findByKeyword(String keyword) {
-        String sql = "select id, name, email, mobile, dob from contact where name like ? or email like ? or mobile like ?";
-        String pattern = "%" + keyword + "%";
-        return jdbcTemplate.query(sql, new ContactRowMapper(), pattern, pattern, pattern);
+    public List<Contact> findByKeyword(String text) {
+        return contactRepository.findByNameLikeOrMobileLikeOrEmailLike(text, text, text);
     }
 }

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -199,5 +200,13 @@ public class ContactServiceImpl implements ContactService {
         dto.setMobile(contact.getMobile());
         dto.setDob(contact.getDob());
         return dto;
+    }
+
+    @Scheduled(cron = "0 */5 * * * *")
+    public void callGreetingsApi(){
+        String url = "https://cbook-qc7i.onrender.com/api/v1/cbook/greetings";
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(url, String.class);
+        log.info("Greetings API response: {}", response);
     }
 }

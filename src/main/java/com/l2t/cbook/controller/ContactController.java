@@ -91,4 +91,10 @@ public class ContactController {
         contactService.sendEmail();
         return ApiResponse.success("Sending email triggered successfully");
     }
+
+    @GetMapping("/greetings")
+    @Operation(summary = "Sends greetings message")
+    public ApiResponse<String> greetings(){
+        return ApiResponse.success("Greetings from CBOOK application");
+    }
 }
