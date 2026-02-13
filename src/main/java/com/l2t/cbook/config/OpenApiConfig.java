@@ -1,8 +1,11 @@
 package com.l2t.cbook.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,6 +21,12 @@ public class OpenApiConfig {
                         .version("v1.0")
                         .contact(new Contact()
                                 .name("L2T")
-                                .email("support@l2t.com")));
+                                .email("support@l2t.com")))
+                .addSecurityItem(new SecurityRequirement().addList("X-API-KEY"))
+                .components(new Components()
+                        .addSecuritySchemes("X-API-KEY", new SecurityScheme()
+                                .type(SecurityScheme.Type.APIKEY)
+                                .in(SecurityScheme.In.HEADER)
+                                .name("X-API-KEY")));
     }
 }
