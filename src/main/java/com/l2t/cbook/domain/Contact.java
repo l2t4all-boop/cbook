@@ -1,5 +1,6 @@
 package com.l2t.cbook.domain;
 
+import com.l2t.cbook.security.AppUser;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,4 +23,8 @@ public class Contact {
     private String mobile;
     @Column(name="dob")
     private LocalDate dob;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser user;
 }

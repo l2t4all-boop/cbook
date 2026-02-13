@@ -16,6 +16,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(apiKeyInterceptor)
                 .addPathPatterns("/api/v1/cbook/**")
                 .excludePathPatterns(
+                        "/api/v1/cbook/auth/**",
                         "/api/v1/cbook/api-keys/**",
                         "/api/v1/cbook/greetings",
                         "/swagger-ui/**",

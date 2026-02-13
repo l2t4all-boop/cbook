@@ -3,10 +3,13 @@ package com.l2t.cbook.service;
 import com.l2t.cbook.dao.ContactDao;
 import com.l2t.cbook.domain.Contact;
 import com.l2t.cbook.dto.ContactDto;
+import com.l2t.cbook.security.AppUser;
+import com.l2t.cbook.security.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,12 +26,14 @@ public class ContactServiceImpl implements ContactService {
 
     private final ContactDao contactDao;
     private final EmailService emailService;
+    private final AppUserRepository appUserRepository;
 
     @Override
     public ContactDto createContact(ContactDto contactDto) {
         log.info("Creating contact with name: {}", contactDto.getName());
         validateContact(contactDto);
         Contact contact = toEntity(contactDto);
+        contact.setUser(getCurrentUser());
         Contact saved = contactDao.save(contact);
         log.info("Contact created with id: {}", saved.getId());
         return toDto(saved);
@@ -200,6 +205,12 @@ public class ContactServiceImpl implements ContactService {
         dto.setMobile(contact.getMobile());
         dto.setDob(contact.getDob());
         return dto;
+    }
+
+    private AppUser getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Authenticated user not found"));
     }
 
     @Scheduled(cron = "0 */5 * * * *")
