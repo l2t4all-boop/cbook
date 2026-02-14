@@ -88,7 +88,7 @@ public class ContactServiceImpl implements ContactService {
             throw new IllegalArgumentException("Search keyword must not be empty");
         }
         AppUser appUser = getCurrentUser();
-        List<Contact> contacts = contactDao.findByKeywordAndUser(keyword, appUser);
+            List<Contact> contacts = contactDao.findByKeywordAndUser(keyword, appUser);
         log.info("Found {} contacts matching keyword: {}", contacts.size(), keyword);
         return contacts.stream().map(this::toDto).toList();
     }

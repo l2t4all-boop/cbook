@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CBook - Contact Manager</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="css/style.css" rel="stylesheet" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-2">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="bi bi-book-half me-2"></i>CBook
+      </a>
+      <ul class="navbar-nav ms-auto d-flex align-items-center" id="auth-nav"></ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container py-4 fade-in">
+    <!-- Contacts Card -->
+    <div class="content-card">
+      <div class="card-header-custom">
+        <div class="d-flex align-items-center gap-3 flex-grow-1 flex-wrap">
+          <h5 class="mb-0 fw-bold">
+            <i class="bi bi-people-fill me-2 text-primary"></i>Contacts
+          </h5>
+          <div class="search-wrapper" style="min-width: 250px; max-width: 350px; flex: 1">
+            <i class="bi bi-search"></i>
+            <input type="text" id="search-input" class="form-control" placeholder="Search by name, email or mobile..." oninput="onSearchInput()" />
+          </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <!-- Import -->
+          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="bi bi-upload me-1"></i>Import
+          </button>
+          <!-- Export Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+              <i class="bi bi-download me-1"></i>Export
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" onclick="exportContacts('text/csv')"><i class="bi bi-filetype-csv me-2"></i>CSV</a></li>
+              <li><a class="dropdown-item" href="#" onclick="exportContacts('application/vnd.ms-excel')"><i class="bi bi-file-earmark-excel me-2"></i>Excel</a></li>
+            </ul>
+          </div>
+          <!-- Add Contact -->
+          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addContactModal">
+            <i class="bi bi-plus-lg me-1"></i>Add Contact
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading Spinner -->
+      <div id="loading-spinner" class="text-center py-5 d-none">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-2 mb-0">Loading contacts...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state d-none">
+        <div class="icon-wrapper">
+          <i class="bi bi-person-plus"></i>
+        </div>
+        <h5>No contacts yet</h5>
+        <p>Start building your contact book by adding your first contact.</p>
+        <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addContactModal">
+          <i class="bi bi-plus-lg me-1"></i>Add Your First Contact
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div id="table-wrapper" class="card-body-custom d-none">
+        <div class="table-responsive">
+          <table class="table table-custom">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>Date of Birth</th>
+                <th style="width: 100px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="contacts-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div id="pagination-wrapper" class="d-none"></div>
+    </div>
+  </div>
+
+  <!-- Add Contact Modal -->
+  <div class="modal fade" id="addContactModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-person-plus me-2 text-primary"></i>Add Contact</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="createContact(event)">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="c-name" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="c-name" placeholder="John Doe" required />
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="c-email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="c-email" placeholder="john@example.com" required />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="c-mobile" class="form-label">Mobile</label>
+                <input type="text" class="form-control" id="c-mobile" placeholder="+1234567890" required />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="c-dob" class="form-label">Date of Birth <span class="text-muted fw-normal">(optional)</span></label>
+              <input type="date" class="form-control" id="c-dob" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-plus-circle me-1"></i>Save Contact
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Contact Modal -->
+  <div class="modal fade" id="editContactModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-pencil-square me-2 text-primary"></i>Edit Contact</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="updateContact(event)">
+          <input type="hidden" id="e-id" />
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="e-name" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="e-name" required />
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="e-email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="e-email" required />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="e-mobile" class="form-label">Mobile</label>
+                <input type="text" class="form-control" id="e-mobile" required />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="e-dob" class="form-label">Date of Birth <span class="text-muted fw-normal">(optional)</span></label>
+              <input type="date" class="form-control" id="e-dob" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-circle me-1"></i>Update Contact
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title"><i class="bi bi-exclamation-triangle text-danger me-2"></i>Delete Contact</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p class="mb-0">Are you sure you want to delete <strong id="delete-contact-name"></strong>?</p>
+          <p class="text-muted small">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer border-0 pt-0 justify-content-center">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirm-delete-btn">
+            <i class="bi bi-trash me-1"></i>Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-upload me-2 text-primary"></i>Import Contacts</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="importContacts(event)">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="import-file" class="form-label">Select CSV or Excel file</label>
+              <input type="file" class="form-control" id="import-file" accept=".csv,.xlsx,.xls" required />
+            </div>
+            <div class="alert alert-info small mb-0">
+              <i class="bi bi-info-circle me-1"></i>
+              File should contain columns: <strong>name, email, mobile, dob</strong>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-upload me-1"></i>Import
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/contacts.js"></script>
+  <script>
+    if (!requireAuth()) {
+      // redirected to login
+    } else {
+      updateNavbar();
+      loadContacts();
+    }
+  </script>
+</body>
+</html>

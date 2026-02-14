@@ -67,11 +67,13 @@ public class ContactDaoImpl implements ContactDao {
 
     @Override
     public List<Contact> findByKeyword(String text) {
-        return contactRepository.findByNameLikeOrMobileLikeOrEmailLike(text, text, text);
+        String pattern = "%" + text + "%";
+        return contactRepository.findByNameLikeOrMobileLikeOrEmailLike(pattern, pattern, pattern);
     }
 
     @Override
     public List<Contact> findByKeywordAndUser(String text, AppUser user) {
-        return contactRepository.findByUserAndKeyword(user, text);
+        String pattern = "%" + text + "%";
+        return contactRepository.findByUserAndKeyword(user, pattern);
     }
 }
