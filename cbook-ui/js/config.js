@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8088/api/v1/cbook";
+const API_BASE = "https://cbook-qc7i.onrender.com/api/v1/cbook";
 
 const API = {
   AUTH: {
