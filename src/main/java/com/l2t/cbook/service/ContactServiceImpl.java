@@ -42,7 +42,8 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public ContactDto getContact(UUID id) {
         log.info("Fetching contact with id: {}", id);
-        Contact contact = contactDao.findById(id)
+        AppUser appUser = getCurrentUser();
+        Contact contact = contactDao.findByIdAndUser(id, appUser)
                 .orElseThrow(() -> new IllegalArgumentException("Contact not found with id: " + id));
         return toDto(contact);
     }
@@ -50,7 +51,8 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public List<ContactDto> getAllContacts() {
         log.info("Fetching all contacts");
-        List<Contact> contacts = contactDao.findAll();
+        AppUser appUser = getCurrentUser();
+        List<Contact> contacts = contactDao.findAllByUser(appUser);
         log.info("Found {} contacts", contacts.size());
         return contacts.stream().map(this::toDto).toList();
     }
@@ -59,9 +61,11 @@ public class ContactServiceImpl implements ContactService {
     public ContactDto updateContact(UUID id, ContactDto contactDto) {
         log.info("Updating contact with id: {}", id);
         validateContact(contactDto);
-        contactDao.findById(id)
+        AppUser appUser = getCurrentUser();
+        contactDao.findByIdAndUser(id, appUser)
                 .orElseThrow(() -> new IllegalArgumentException("Contact not found with id: " + id));
         Contact contact = toEntity(contactDto);
+        contact.setUser(appUser);
         Contact updated = contactDao.update(id, contact);
         log.info("Contact updated with id: {}", id);
         return toDto(updated);
@@ -70,7 +74,8 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public void deleteContact(UUID id) {
         log.info("Deleting contact with id: {}", id);
-        contactDao.findById(id)
+        AppUser appUser = getCurrentUser();
+        contactDao.findByIdAndUser(id, appUser)
                 .orElseThrow(() -> new IllegalArgumentException("Contact not found with id: " + id));
         contactDao.deleteById(id);
         log.info("Contact deleted with id: {}", id);
@@ -82,7 +87,8 @@ public class ContactServiceImpl implements ContactService {
         if (keyword == null || keyword.isBlank()) {
             throw new IllegalArgumentException("Search keyword must not be empty");
         }
-        List<Contact> contacts = contactDao.findByKeyword(keyword);
+        AppUser appUser = getCurrentUser();
+        List<Contact> contacts = contactDao.findByKeywordAndUser(keyword, appUser);
         log.info("Found {} contacts matching keyword: {}", contacts.size(), keyword);
         return contacts.stream().map(this::toDto).toList();
     }
@@ -104,7 +110,8 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public ContactDto updateContactEmail(UUID id, String email) {
         log.info("Updating email for contact with id: {}", id);
-        contactDao.findById(id)
+        AppUser appUser = getCurrentUser();
+        contactDao.findByIdAndUser(id, appUser)
                 .orElseThrow(() -> new IllegalArgumentException("Contact not found with id: " + id));
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("Email must not be empty");

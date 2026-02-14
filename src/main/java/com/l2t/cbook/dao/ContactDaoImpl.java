@@ -1,6 +1,7 @@
 package com.l2t.cbook.dao;
 
 import com.l2t.cbook.domain.Contact;
+import com.l2t.cbook.security.AppUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -27,8 +28,18 @@ public class ContactDaoImpl implements ContactDao {
     }
 
     @Override
+    public Optional<Contact> findByIdAndUser(UUID id, AppUser user) {
+        return contactRepository.findByIdAndUser(id, user);
+    }
+
+    @Override
     public List<Contact> findAll() {
         return contactRepository.findAll();
+    }
+
+    @Override
+    public List<Contact> findAllByUser(AppUser user) {
+        return contactRepository.findAllByUser(user);
     }
 
     @Override
@@ -57,5 +68,10 @@ public class ContactDaoImpl implements ContactDao {
     @Override
     public List<Contact> findByKeyword(String text) {
         return contactRepository.findByNameLikeOrMobileLikeOrEmailLike(text, text, text);
+    }
+
+    @Override
+    public List<Contact> findByKeywordAndUser(String text, AppUser user) {
+        return contactRepository.findByUserAndKeyword(user, text);
     }
 }
